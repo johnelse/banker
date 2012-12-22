@@ -13,6 +13,7 @@ class Transaction():
         self.name = name
         self.amount = amount
 
+# Find the database path from ~/.banker
 def get_db_path():
     user = getpass.getuser()
     home_dir = os.path.expanduser("~" + user)
@@ -24,6 +25,7 @@ def get_db_path():
     except:
         raise RuntimeError("Failed to read database path")
 
+# Remove any existing database file, then initialise an empty database.
 def init_db(path):
     if os.path.isfile(path):
         os.remove(path)
@@ -38,6 +40,8 @@ name TEXT(50),\
 amount INTEGER)")
     conn.close()
 
+# Initialise the database if it doesn't exist,
+# then open it and return the connection.
 def open_db():
     path = get_db_path()
     if not os.path.isfile(path):
@@ -74,6 +78,7 @@ def get_months(conn, year):
         months.append(row[0])
     return months
 
+# Get the list of all transactions for the given year and month.
 def get_transactions(conn, year, month):
     cursor = conn.cursor()
     cursor.execute("select * from transactions where year=? and month=?\
