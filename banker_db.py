@@ -5,6 +5,14 @@ import sqlite3
 
 config_filename = ".banker"
 
+class Transaction():
+    def __init__(self, year, month, day, name, amount):
+        self.year = year
+        self.month = month
+        self.day = day
+        self.name = name
+        self.amount = amount
+
 def get_db_path():
     user = getpass.getuser()
     home_dir = os.path.expanduser("~" + user)
@@ -40,11 +48,11 @@ def open_db():
 def close_db(conn):
     conn.close()
 
-def add_transaction(conn, year, month, day, name, amount):
+def add_transaction(conn, t):
     cursor = conn.cursor()
     cursor.execute("insert into transactions\
 (year, month, day, name, amount) values (?, ?, ?, ?, ?)", 
-        (year, month, day, name, amount))
+        (t.year, t.month, t.day, t.name, t.amount))
     conn.commit()
 
 # Get the list of all years for which we have transactions.
@@ -60,8 +68,18 @@ def get_years(conn):
 def get_months(conn, year):
     cursor = conn.cursor()
     cursor.execute("select distinct month from transactions where year=?\
-order by month", (year,))
+        order by month", (year,))
     months = []
     for row in cursor:
         months.append(row[0])
     return months
+
+def get_transactions(conn, year, month):
+    cursor = conn.cursor()
+    cursor.execute("select * from transactions where year=? and month=?\
+        order by day", (year, month))
+    transactions = []
+    for row in cursor:
+        transactions.append(
+            Transaction(row[1], row[2], row[3], row[4], row[5]))
+    return transactions
