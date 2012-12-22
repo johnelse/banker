@@ -6,7 +6,7 @@ def make_listbox(height, items):
         listbox.append(item, index)
     return listbox
 
-def main(screen):
+def main(screen, conn):
     grid = snack.GridForm(screen, "Banker", 1, 1)
     listbox = make_listbox(20, ["Statements", "New transaction", "Exit"])
     grid.add(listbox, 0, 0)
