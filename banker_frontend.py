@@ -25,28 +25,31 @@ def get_choice(screen, items):
     grid = snack.GridForm(screen, "Banker", 1, 1)
     grid.add(listbox, 0, 0)
     grid.runOnce()
-    return items[listbox.current()]
+    return listbox.current()
 
 # Return a choice from the list of items,
 # or None if the user chooses the "Back" choice.
 def get_choice_or_back(screen, items):
-    items = items + ["Back"]
-    choice = get_choice(screen, items)
-    if choice == "Back":
-        return None
-    return choice
+    index = get_choice(screen, items + ["Back"])
+    if index < len(items):
+        return index
+    return None
 
 # Choose from the months in the chosen year which have one or more transactions.
 def choose_month(conn, screen, year):
     months = banker_db.get_months(conn, year)
-    month = get_choice_or_back(screen, months)
-    return month
+    index = get_choice_or_back(screen, months)
+    if index is None:
+        return index
+    return months[index]
 
 # Choose from all the years in the database which have transactions.
 def choose_year(conn, screen):
     years = banker_db.get_years(conn)
-    year = get_choice_or_back(screen, years)
-    return year
+    index = get_choice_or_back(screen, years)
+    if index is None:
+        return index
+    return years[index]
 
 # Display a list of transactions for the chosen year and month.
 def display_statement(conn, screen, year, month):
@@ -84,8 +87,9 @@ def create_transaction(conn, screen):
 # Choose a top-level action to perform.
 def choose_action(conn, screen):
     actions = [Actions.VIEW_STATEMENTS, Actions.ADD_TRANSACTION, Actions.EXIT]
-    action = get_choice(screen, actions)
-    return action
+    action_strings = ["View statements", "Add transaction", "Exit"]
+    index = get_choice(screen, action_strings)
+    return actions[index]
 
 # Set up initial state, then start the main loop.
 def main(screen, conn):
