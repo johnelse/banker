@@ -2,7 +2,6 @@
 
 import banker_db
 import banker_frontend
-
 import snack
 
 if __name__ == "__main__":

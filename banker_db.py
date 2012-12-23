@@ -19,7 +19,7 @@ def get_db_path():
     home_dir = os.path.expanduser("~" + user)
     config_path = os.path.join(home_dir, config_filename)
     try:
-        config_file = open(config_path)
+        config_file = open(config_path, "r")
         db_path = config_file.readline().strip()
         return db_path
     except:
