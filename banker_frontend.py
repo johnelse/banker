@@ -69,6 +69,7 @@ def main(screen, conn):
     year = None
     month = None
     while running:
+        # Choose a top-level action.
         if state == States.CHOOSE_ACTION:
             action = choose_action(conn, screen)
             if action == Actions.VIEW_STATEMENTS:
@@ -77,20 +78,24 @@ def main(screen, conn):
                 state = States.ADD_TRANSACTION
             elif action == Actions.EXIT:
                 running = False
+        # Choose a year.
         elif state ==  States.CHOOSE_YEAR:
             year = choose_year(conn, screen)
             if year:
                 state = States.CHOOSE_MONTH
             else:
                 state = States.CHOOSE_ACTION
+        # Choose a month (assuming a year has already been chosen).
         elif state == States.CHOOSE_MONTH:
             month = choose_month(conn, screen, year)
             if month:
                 state = States.DISPLAY_STATEMENT
             else:
                 state = States.CHOOSE_YEAR
+        # Display a statement.
         elif state == States.DISPLAY_STATEMENT:
             display_statement(conn, screen, year, month)
             state = States.CHOOSE_MONTH
+        # Add a transaction.
         elif state == States.ADD_TRANSACTION:
             running = False
