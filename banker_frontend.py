@@ -14,7 +14,7 @@ States = Enum(["CHOOSE_ACTION", "CHOOSE_YEAR", "CHOOSE_MONTH",
 Actions = Enum(["VIEW_STATEMENTS", "ADD_TRANSACTION", "EXIT"])
 
 def make_listbox(height, items):
-    listbox = snack.Listbox(height, returnExit=1)
+    listbox = snack.Listbox(height, returnExit=1, scroll=1)
     for index, item in enumerate(items):
         listbox.append(str(item), index)
     return listbox
@@ -47,6 +47,14 @@ def choose_year(conn, screen):
     years = banker_db.get_years(conn)
     year = get_choice_or_back(screen, years)
     return year
+
+# Display a list of transactions for the chosen year and month.
+def display_statement(conn, screen, year, month):
+    transactions = banker_db.get_transactions(conn, year, month)
+    transaction_strings =\
+        map(lambda t: "%2d %30s %10.2f" %\
+            (t.day, t.name, float(t.amount) / 100), transactions)
+    get_choice(screen, transaction_strings)
 
 # Choose a top-level action to perform.
 def choose_action(conn, screen):
@@ -82,6 +90,7 @@ def main(screen, conn):
             else:
                 state = States.CHOOSE_YEAR
         elif state == States.DISPLAY_STATEMENT:
-            running = False
+            display_statement(conn, screen, year, month)
+            state = States.CHOOSE_MONTH
         elif state == States.ADD_TRANSACTION:
             running = False
