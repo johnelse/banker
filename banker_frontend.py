@@ -56,6 +56,31 @@ def display_statement(conn, screen, year, month):
             (t.day, t.name, float(t.amount) / 100), transactions)
     get_choice(screen, transaction_strings)
 
+def parse_transaction(transaction_string):
+    try:
+        fields = transaction_string.split(',')
+        year = int(fields[0])
+        month = int(fields[1])
+        day = int(fields[2])
+        name = fields[3]
+        amount = int(fields[4])
+        transaction = banker_db.Transaction(year, month, day, name, amount)
+        return transaction
+    except:
+        raise RuntimeError("Failed to parse transaction.")
+
+# Prompt the user to enter details about a new transaction.
+def create_transaction(conn, screen):
+    entry = snack.Entry(60, returnExit=1)
+    grid = snack.GridForm(screen, "Banker", 1, 1)
+    grid.add(entry, 0, 0)
+    grid.runOnce()
+    try:
+        transaction = parse_transaction(entry.value())
+        return transaction
+    except:
+        return None
+
 # Choose a top-level action to perform.
 def choose_action(conn, screen):
     actions = [Actions.VIEW_STATEMENTS, Actions.ADD_TRANSACTION, Actions.EXIT]
@@ -98,4 +123,8 @@ def main(screen, conn):
             state = States.CHOOSE_MONTH
         # Add a transaction.
         elif state == States.ADD_TRANSACTION:
-            running = False
+            transaction = create_transaction(conn, screen)
+            if transaction:
+                banker_db.add_transaction(conn, transaction)
+            else:
+                state = States.CHOOSE_ACTION
